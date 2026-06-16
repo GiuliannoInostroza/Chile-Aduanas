@@ -1,0 +1,209 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chile Aduanas - Prototipo V1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Deficiencia: Colores grises genéricos, no representan al Servicio Nacional de Aduanas de Chile */
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen text-gray-800">
+
+    <div id="view-login" class="min-h-screen flex flex-col items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md border-t-4 border-gray-500">
+            <h1 class="text-2xl font-bold text-center mb-2">Gestión Digital Aduanera</h1>
+            <p class="text-gray-500 text-center mb-8">Paso Fronterizo Los Libertadores</p>
+
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                <p class="text-sm text-blue-700"><strong>Credenciales de Prototipo:</strong><br>Usuario: admin | Clave:
+                    1234</p>
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Usuario</label>
+                    <input type="text" id="user"
+                        class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Contraseña</label>
+                    <input type="password" id="pass"
+                        class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-gray-600 text-white font-bold py-2 rounded hover:bg-gray-700 transition">Botón de
+                    Entrada</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-layout" class="hidden min-h-screen flex flex-col">
+
+        <header class="bg-white border-b p-4 flex justify-between items-center shadow-sm">
+            <div class="flex items-center space-x-2">
+                <i data-lucide="shield-check" class="text-gray-600"></i>
+                <span class="text-xl font-black tracking-tight">Chile Aduanas</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm font-medium bg-gray-200 px-3 py-1 rounded-full">Operador: Giulianno
+                    Inostroza</span>
+                <button onclick="location.reload()" class="text-red-500 hover:underline text-sm">Salir</button>
+            </div>
+        </header>
+
+        <div class="flex flex-1">
+
+            <aside class="w-64 bg-gray-800 text-white p-6 space-y-6">
+                <nav class="space-y-2">
+                    <button onclick="showSection('home')" id="btn-home"
+                        class="w-full flex items-center space-x-3 p-2 rounded bg-gray-700 text-white">
+                        <i data-lucide="layout-dashboard"></i> <span>Dashboard</span>
+                    </button>
+                    <button onclick="showSection('vehicles')" id="btn-vehicles"
+                        class="w-full flex items-center space-x-3 p-2 rounded hover:bg-gray-700 text-gray-300">
+                        <i data-lucide="truck"></i> <span>Vehículos (CH-AR)</span>
+                    </button>
+                    <button onclick="showSection('minors')" id="btn-minors"
+                        class="w-full flex items-center space-x-3 p-2 rounded hover:bg-gray-700 text-gray-300">
+                        <i data-lucide="users"></i> <span>Trámite Menores</span>
+                    </button>
+                </nav>
+            </aside>
+
+            <main class="flex-1 p-10 bg-gray-50 overflow-y-auto">
+
+                <div id="sec-home" class="space-y-6">
+                    <div class="flex justify-between items-end">
+                        <h2 class="text-3xl font-bold">Estado del Paso Fronterizo</h2>
+                        <span class="text-gray-500">Última actualización: Hoy, 10:45 AM</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-lg shadow border-l-8 border-red-500">
+                            <p class="text-sm uppercase font-bold text-gray-400">Tiempo de Espera Actual</p>
+                            <p class="text-4xl font-black text-red-600">14 Horas</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow border-l-8 border-yellow-500">
+                            <p class="text-sm uppercase font-bold text-gray-400">Vehículos en Fila</p>
+                            <p class="text-4xl font-black text-gray-700">126</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow border-l-8 border-green-500">
+                            <p class="text-sm uppercase font-bold text-gray-400">Meta Reducción</p>
+                            <p class="text-4xl font-black text-green-600">50%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sec-vehicles" class="hidden space-y-6">
+                    <h2 class="text-2xl font-bold">Salida y Admisión Temporal de Vehículos</h2>
+                    <div class="bg-white p-8 rounded-lg shadow max-w-4xl">
+                        <p class="mb-6 text-gray-500 text-sm">Acuerdo Chileno-Argentino (Vigencia 180 días)</p>
+
+                        <form id="form-vehicle" class="grid grid-cols-2 gap-4"
+                            onsubmit="alert('Datos enviados (V1 - Sin validación)'); return false;">
+                            <div class="col-span-1">
+                                <label class="block text-sm mb-1">Patente del Vehículo</label>
+                                <input type="text" class="w-full border rounded p-2" placeholder="Ej: ABCD-12">
+                            </div>
+                            <div class="col-span-1">
+                                <label class="block text-sm mb-1">País de Procedencia</label>
+                                <select class="w-full border rounded p-2">
+                                    <option>Chile</option>
+                                    <option>Argentina</option>
+
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm mb-1">Marca</label>
+                                <input type="text" class="w-full border rounded p-2">
+                            </div>
+                            <div>
+                                <label class="block text-sm mb-1">Modelo</label>
+                                <input type="text" class="w-full border rounded p-2">
+                            </div>
+                            <div class="col-span-2 pt-4">
+                                <button type="submit"
+                                    class="bg-gray-600 text-white px-6 py-2 rounded font-bold hover:bg-black transition">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="sec-minors" class="hidden space-y-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Control de Menores de Edad</h2>
+                    <div class="bg-white p-8 rounded-lg shadow max-w-2xl border-2 border-dashed border-gray-300">
+                        <div class="text-center space-y-4">
+                            <i data-lucide="file-up" class="w-12 h-12 mx-auto text-gray-400"></i>
+                            <div>
+                                <h3 class="font-bold text-lg">Carga de Autorización Notarial</h3>
+                                <p class="text-gray-500 text-sm">Obligatorio si el menor viaja sin uno de los padres</p>
+                            </div>
+                            <input type="file" id="minor-file" class="hidden">
+                            <label for="minor-file"
+                                class="inline-block bg-gray-200 text-gray-700 px-4 py-2 rounded cursor-pointer hover:bg-gray-300 border border-gray-400">
+                                Seleccionar PDF / Imagen
+                            </label>
+                            <div class="mt-4 pt-4 border-t">
+
+                                <button type="button" class="text-blue-500 font-bold hover:underline">Subir
+                                    ahora</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Lógica de navegación simple
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
+
+            // Deficiencia: Permite el ingreso incluso con campos vacíos (Error de seguridad/calidad)
+            if (u === 'admin' && p === '1234') {
+                document.getElementById('view-login').classList.add('hidden');
+                document.getElementById('app-layout').classList.remove('hidden');
+                lucide.createIcons();
+            } else {
+                alert('Datos incorrectos');
+            }
+        }
+
+        function showSection(id) {
+            const sections = ['home', 'vehicles', 'minors'];
+            sections.forEach(s => {
+                const el = document.getElementById('sec-' + s);
+                const btn = document.getElementById('btn-' + s);
+                if (s === id) {
+                    el.classList.remove('hidden');
+                    btn.classList.add('bg-gray-700', 'text-white');
+                    btn.classList.remove('text-gray-300');
+                } else {
+                    el.classList.add('hidden');
+                    btn.classList.remove('bg-gray-700', 'text-white');
+                    btn.classList.add('text-gray-300');
+                }
+            });
+            lucide.createIcons();
+        }
+
+        // Init icons
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
