@@ -163,24 +163,55 @@
 
             <main class="flex-1 p-10 bg-gray-50 overflow-y-auto">
 
-                <div id="sec-home" class="space-y-6">
-                    <div class="flex justify-between items-end">
-                        <h2 class="text-3xl font-bold">Estado del Paso Fronterizo</h2>
-                        <span class="text-gray-500">Última actualización: Hoy, 10:45 AM</span>
+                <div id="sec-home" class="space-y-8">
+                    <div>
+                        <h2 class="text-3xl font-black text-gray-800 mb-2">Trámites Disponibles</h2>
+                        <p class="text-gray-600">Seleccione el tipo de declaración que desea realizar.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-lg shadow border-l-8 border-red-500">
-                            <p class="text-sm uppercase font-bold text-gray-400">Tiempo de Espera Actual</p>
-                            <p class="text-4xl font-black text-red-600">14 Horas</p>
+                        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 flex flex-col hover:shadow-lg transition relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">COSTO: $0</div>
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="bg-blue-100 p-3 rounded-full text-aduanas-blue">
+                                    <i data-lucide="car" class="w-6 h-6"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800 leading-tight">Salida y Admisión Temporal de Vehículos</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4 flex-1">Acuerdo Chileno-Argentino. Declaración para el cruce de vehículos por el Paso Los Libertadores.</p>
+                            <div class="grid grid-cols-2 gap-2 mt-auto">
+                                <button onclick="showSection('vehicles')" class="bg-white border border-aduanas-blue text-aduanas-blue text-sm font-bold py-2 rounded text-center hover:bg-blue-50 transition">Ingreso</button>
+                                <button onclick="showSection('vehicles')" class="bg-white border border-aduanas-blue text-aduanas-blue text-sm font-bold py-2 rounded text-center hover:bg-blue-50 transition">Salida</button>
+                            </div>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow border-l-8 border-yellow-500">
-                            <p class="text-sm uppercase font-bold text-gray-400">Vehículos en Fila</p>
-                            <p class="text-4xl font-black text-gray-700">126</p>
+
+                        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 flex flex-col hover:shadow-lg transition relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">COSTO: $0</div>
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="bg-green-100 p-3 rounded-full text-green-600">
+                                    <i data-lucide="apple" class="w-6 h-6"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800 leading-tight">Declaración Jurada SAG y Aduanas</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4 flex-1">Para ingreso de equipaje y alimentos por pasos fronterizos terrestres CH-AR.</p>
+                            <div class="grid grid-cols-2 gap-2 mt-auto">
+                                <button onclick="showSection('vehicles')" class="bg-aduanas-blue text-white text-sm font-bold py-2 rounded text-center hover-bg-aduanas-blue transition shadow">Ingreso</button>
+                                <button onclick="showSection('vehicles')" class="bg-aduanas-blue text-white text-sm font-bold py-2 rounded text-center hover-bg-aduanas-blue transition shadow">Salida</button>
+                            </div>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow border-l-8 border-green-500">
-                            <p class="text-sm uppercase font-bold text-gray-400">Meta Reducción</p>
-                            <p class="text-4xl font-black text-green-600">50%</p>
+
+                        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 flex flex-col hover:shadow-lg transition">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="bg-purple-100 p-3 rounded-full text-purple-600">
+                                    <i data-lucide="award" class="w-6 h-6"></i>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-800 leading-tight">Título de Salida Temporal (Placa de Gracia)</h3>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-4 flex-1">Exclusivo para vehículos diplomáticos (C.D., C.C., A.T.) y misiones oficiales.</p>
+                            <div class="grid grid-cols-2 gap-2 mt-auto">
+                                <button onclick="showSection('vehicles')" class="bg-white border border-aduanas-blue text-aduanas-blue text-sm font-bold py-2 rounded text-center hover:bg-blue-50 transition">Ingreso</button>
+                                <button onclick="showSection('vehicles')" class="bg-white border border-aduanas-blue text-aduanas-blue text-sm font-bold py-2 rounded text-center hover:bg-blue-50 transition">Salida</button>
+                            </div>
                         </div>
                     </div>
                 </div>
