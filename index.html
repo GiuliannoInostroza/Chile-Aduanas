@@ -51,21 +51,25 @@
                     1234</p>
             </div>
 
-            <form onsubmit="handleLogin(event)" class="space-y-4">
+            <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium mb-1">Usuario</label>
                     <input type="text" id="user"
                         class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                    <p id="error-user" class="text-red-600 text-sm mt-1 hidden">El usuario es requerido.</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1">Contraseña</label>
                     <input type="password" id="pass"
                         class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                    <p id="error-pass" class="text-red-600 text-sm mt-1 hidden">La contraseña es requerida.</p>
                 </div>
 
-                <button type="submit"
-                    class="w-full bg-aduanas-blue text-white font-bold py-2 rounded hover-bg-aduanas-blue transition">Botón de
-                    Entrada</button>
+                <button type="submit" id="btn-login-submit"
+                    class="w-full bg-aduanas-blue text-white font-bold py-2 rounded hover-bg-aduanas-blue transition flex justify-center items-center">
+                    <span id="login-btn-text">Ingresar al Sistema</span>
+                    <i data-lucide="loader-2" id="login-spinner" class="w-5 h-5 ml-2 animate-spin hidden"></i>
+                </button>
             </form>
         </div>
     </div>
@@ -193,17 +197,51 @@
         // Lógica de navegación simple
         function handleLogin(e) {
             e.preventDefault();
-            const u = document.getElementById('user').value;
-            const p = document.getElementById('pass').value;
+            const u = document.getElementById('user').value.trim();
+            const p = document.getElementById('pass').value.trim();
 
-            // Deficiencia: Permite el ingreso incluso con campos vacíos (Error de seguridad/calidad)
-            if (u === 'admin' && p === '1234') {
-                document.getElementById('view-login').classList.add('hidden');
-                document.getElementById('app-layout').classList.remove('hidden');
-                lucide.createIcons();
+            let hasErrors = false;
+
+            if (!u) {
+                document.getElementById('user').classList.add('border-red-500');
+                document.getElementById('error-user').classList.remove('hidden');
+                hasErrors = true;
             } else {
-                alert('Datos incorrectos');
+                document.getElementById('user').classList.remove('border-red-500');
+                document.getElementById('error-user').classList.add('hidden');
             }
+
+            if (!p) {
+                document.getElementById('pass').classList.add('border-red-500');
+                document.getElementById('error-pass').classList.remove('hidden');
+                hasErrors = true;
+            } else {
+                document.getElementById('pass').classList.remove('border-red-500');
+                document.getElementById('error-pass').classList.add('hidden');
+            }
+
+            if (hasErrors) {
+                return;
+            }
+
+            const btnText = document.getElementById('login-btn-text');
+            const spinner = document.getElementById('login-spinner');
+            
+            btnText.textContent = "Ingresando...";
+            spinner.classList.remove('hidden');
+
+            setTimeout(() => {
+                btnText.textContent = "Ingresar al Sistema";
+                spinner.classList.add('hidden');
+
+                if (u === 'admin' && p === '1234') {
+                    document.getElementById('view-login').classList.add('hidden');
+                    document.getElementById('app-layout').classList.remove('hidden');
+                    lucide.createIcons();
+                } else {
+                    alert('Datos incorrectos');
+                }
+            }, 1000);
         }
 
         function showSection(id) {
