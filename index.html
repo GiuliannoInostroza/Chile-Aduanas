@@ -36,6 +36,27 @@
         .text-aduanas-red {
             color: #e03c31;
         }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 50;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -78,15 +99,46 @@
 
     <div id="app-layout" class="hidden min-h-screen flex flex-col">
 
-        <header class="bg-aduanas-blue text-white border-b p-4 flex justify-between items-center shadow-sm">
-            <div class="flex items-center space-x-2">
-                <i data-lucide="shield-check" class="text-white"></i>
-                <span class="text-xl font-black tracking-tight">Chile Aduanas</span>
-            </div>
-            <div class="flex items-center space-x-4">
-                <span class="text-sm font-medium bg-gray-200 px-3 py-1 rounded-full">Operador: Giulianno
-                    Inostroza</span>
-                <button onclick="location.reload()" class="text-red-500 hover:underline text-sm">Salir</button>
+        <header class="bg-aduanas-blue text-white shadow-md relative z-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16 items-center">
+                    <div class="flex items-center space-x-4">
+                        <i data-lucide="shield-check" class="text-white w-8 h-8"></i>
+                        <span class="font-bold text-xl tracking-wide hidden sm:block">Servicio Nacional de Aduanas</span>
+                    </div>
+
+                    <div class="flex items-center space-x-6 relative">
+                        <div class="relative group cursor-pointer tooltip">
+                            <i data-lucide="bell" class="w-6 h-6 hover:text-gray-300 transition"></i>
+                            <span class="absolute top-0 right-0 -mt-1 -mr-1 flex h-3 w-3">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                            </span>
+                            <div class="tooltip-text hidden group-hover:block w-48 text-left !left-auto !right-0 !transform-none !bottom-auto !top-full mt-2 bg-white text-gray-800 border shadow-xl p-3">
+                                <p class="font-bold border-b pb-1 mb-2">Notificaciones</p>
+                                <p class="text-xs">✔ Trámite #451 aprobado.</p>
+                                <p class="text-xs mt-1">⚠ Actualización de políticas.</p>
+                            </div>
+                        </div>
+
+                        <div class="relative cursor-pointer" id="user-menu-btn" onclick="toggleUserMenu()">
+                            <div class="flex items-center space-x-2 hover:bg-[#002277] p-2 rounded transition">
+                                <div class="bg-white text-aduanas-blue rounded-full p-1">
+                                    <i data-lucide="user" class="w-5 h-5"></i>
+                                </div>
+                                <span class="font-medium" id="header-user-name">Usuario</span>
+                                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                            </div>
+
+                            <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"><i data-lucide="settings" class="w-4 h-4 mr-2"></i> Ajustes de Perfil</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"><i data-lucide="help-circle" class="w-4 h-4 mr-2"></i> Ayuda</a>
+                                <hr class="my-1">
+                                <a href="#" onclick="logout()" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center"><i data-lucide="log-out" class="w-4 h-4 mr-2"></i> Cerrar Sesión</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -274,6 +326,19 @@
                     showToast('Datos incorrectos', 'error');
                 }
             }, 1000);
+        }
+
+        function toggleUserMenu() {
+            const menu = document.getElementById('user-dropdown');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+            }
+        }
+
+        function logout() {
+            location.reload();
         }
 
         function showSection(id) {
