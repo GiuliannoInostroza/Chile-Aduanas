@@ -154,6 +154,9 @@
                         class="w-full flex items-center space-x-3 p-2 rounded hover:bg-gray-700 text-gray-300">
                         <i data-lucide="truck"></i> <span>Vehículos (CH-AR)</span>
                     </button>
+                    <button onclick="showSection('admin')" id="btn-admin" class="hidden w-full flex items-center space-x-3 p-2 rounded hover:bg-gray-700 text-gray-300">
+                        <i data-lucide="users"></i> <span>Administración</span>
+                    </button>
                 </nav>
             </aside>
 
@@ -362,6 +365,57 @@
                     </div>
                 </div>
 
+                <div id="sec-admin" class="hidden fade-in space-y-6">
+                    <div class="flex justify-between items-end mb-6 border-b pb-4">
+                        <div>
+                            <h2 class="text-3xl font-black text-gray-800 mb-1">Gestión de Usuarios</h2>
+                            <p class="text-gray-600">Panel de administración seguro con enmascaramiento de datos personales.</p>
+                        </div>
+                        <button class="bg-aduanas-blue text-white px-4 py-2 rounded shadow hover-bg-aduanas-blue font-bold flex items-center">
+                            <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i> Nuevo Fiscalizador
+                        </button>
+                    </div>
+
+                    <div class="bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4 text-left font-bold text-gray-700 uppercase tracking-wider">ID / Username</th>
+                                    <th scope="col" class="px-6 py-4 text-left font-bold text-gray-700 uppercase tracking-wider">Rol</th>
+                                    <th scope="col" class="px-6 py-4 text-left font-bold text-gray-700 uppercase tracking-wider">Último Acceso</th>
+                                    <th scope="col" class="px-6 py-4 text-right font-bold text-gray-700 uppercase tracking-wider">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-bold text-gray-800">m.salinas***</div>
+                                        <div class="text-xs text-gray-500">12.***.***-K</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap"><span class="bg-blue-100 text-aduanas-blue px-2 py-1 rounded-full text-xs font-bold">Fiscalizador</span></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500">Hace 2 horas</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right font-medium space-x-3">
+                                        <button class="text-blue-600 hover:text-blue-900" title="Modificar Roles"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                                        <button class="text-red-600 hover:text-red-900" title="Eliminar Acceso" onclick="confirmDelete()"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-bold text-gray-800">p.gonzalez***</div>
+                                        <div class="text-xs text-gray-500">15.***.***-2</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap"><span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-bold">Auditor</span></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500">Hace 1 día</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right font-medium space-x-3">
+                                        <button class="text-blue-600 hover:text-blue-900"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                                        <button class="text-red-600 hover:text-red-900" onclick="confirmDelete()"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </main>
         </div>
     </div>
@@ -436,7 +490,13 @@
                 btnText.textContent = "Ingresar al Sistema";
                 spinner.classList.add('hidden');
 
-                if (u === 'admin' && p === '1234') {
+                if (u === 'admin' && p === 'admin123') {
+                    document.getElementById('view-login').classList.add('hidden');
+                    document.getElementById('app-layout').classList.remove('hidden');
+                    document.getElementById('btn-admin').classList.remove('hidden');
+                    lucide.createIcons();
+                    showToast('Sesión iniciada correctamente', 'success');
+                } else if (u === 'user' && p === '1234') {
                     document.getElementById('view-login').classList.add('hidden');
                     document.getElementById('app-layout').classList.remove('hidden');
                     lucide.createIcons();
@@ -555,8 +615,14 @@
             location.reload();
         }
 
+        function confirmDelete() {
+            if(confirm("¿Está seguro que desea eliminar este acceso? Esta acción requiere autorización del jefe de turno.")) {
+                showToast("Solicitud de eliminación enviada a auditoría.", "success");
+            }
+        }
+
         function showSection(id) {
-            const sections = ['home', 'vehicles'];
+            const sections = ['home', 'vehicles', 'admin'];
             sections.forEach(s => {
                 const el = document.getElementById('sec-' + s);
                 const btn = document.getElementById('btn-' + s);
