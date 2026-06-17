@@ -243,38 +243,93 @@
                     </div>
                 </div>
 
-                <div id="sec-vehicles" class="hidden space-y-6">
-                    <h2 class="text-2xl font-bold">Salida y Admisión Temporal de Vehículos</h2>
-                    <div class="bg-white p-8 rounded-lg shadow max-w-4xl">
-                        <p class="mb-6 text-gray-500 text-sm">Acuerdo Chileno-Argentino (Vigencia 180 días)</p>
+                <div id="sec-vehicles" class="hidden fade-in">
+                    <div class="flex flex-col lg:flex-row gap-8">
+                        <div class="w-full lg:w-2/3 bg-white p-8 rounded-xl shadow-md border border-gray-200">
+                            <h2 class="text-2xl font-black text-gray-800 mb-2 border-b pb-4">Declaración de Vehículo (Acuerdo CH-AR)</h2>
+                            <p class="text-gray-500 text-sm mb-4 mt-2">Complete todos los datos. Los campos marcados con asterisco (*) son obligatorios.</p>
 
-                        <form id="form-vehicle" class="grid grid-cols-2 gap-4"
-                            onsubmit="showToast('Datos enviados correctamente', 'success'); return false;">
-                            <div class="col-span-1">
-                                <label class="block text-sm mb-1">Patente del Vehículo</label>
-                                <input type="text" class="w-full border rounded p-2" placeholder="Ej: ABCD-12">
+                            <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-r-lg">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i data-lucide="printer" class="h-5 w-5 text-green-500"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-green-700 font-bold">Impresión Automática (Acuerdo CH-AR)</p>
+                                        <p class="text-sm text-green-600">Al procesar la declaración, se generarán automáticamente las 2 copias requeridas por el servicio.</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-span-1">
-                                <label class="block text-sm mb-1">País de Procedencia</label>
-                                <select class="w-full border rounded p-2">
-                                    <option>Chile</option>
-                                    <option>Argentina</option>
 
-                                </select>
+                            <form id="form-vehicle" onsubmit="handleVehicleSubmit(event)" class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1">
+                                            <label for="veh-patente" class="block text-sm font-bold text-gray-700">Patente *</label>
+                                            <div class="relative tooltip cursor-help">
+                                                <i data-lucide="help-circle" class="w-4 h-4 text-aduanas-blue"></i>
+                                                <span class="tooltip-text">Sin guiones ni espacios. Ej: ABCD12</span>
+                                            </div>
+                                        </div>
+                                        <input type="text" id="veh-patente" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-aduanas-blue transition">
+                                        <p class="text-red-600 text-xs mt-1 hidden font-medium" id="err-veh-patente">La patente es obligatoria.</p>
+                                    </div>
+                                    <div>
+                                        <label for="veh-marca" class="block text-sm font-bold text-gray-700 mb-1">Marca *</label>
+                                        <input type="text" id="veh-marca" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-aduanas-blue transition">
+                                        <p class="text-red-600 text-xs mt-1 hidden font-medium" id="err-veh-marca">La marca es obligatoria.</p>
+                                    </div>
+                                    <div>
+                                        <label for="veh-modelo" class="block text-sm font-bold text-gray-700 mb-1">Modelo *</label>
+                                        <input type="text" id="veh-modelo" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-aduanas-blue transition">
+                                        <p class="text-red-600 text-xs mt-1 hidden font-medium" id="err-veh-modelo">El modelo es obligatorio.</p>
+                                    </div>
+                                    <div>
+                                        <label for="veh-pais" class="block text-sm font-bold text-gray-700 mb-1">País de Procedencia *</label>
+                                        <select id="veh-pais" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-aduanas-blue transition">
+                                            <option value="">-- Seleccione País --</option>
+                                            <option value="CL">Chile</option>
+                                            <option value="AR">Argentina</option>
+                                        </select>
+                                        <p class="text-red-600 text-xs mt-1 hidden font-medium" id="err-veh-pais">Seleccione un país válido.</p>
+                                    </div>
+                                </div>
+
+                                <div class="pt-4 flex justify-end">
+                                    <button type="submit" id="btn-submit-veh" class="bg-aduanas-blue text-white font-bold px-8 py-3 rounded-lg hover-bg-aduanas-blue transition shadow-lg flex items-center">
+                                        <span id="veh-btn-text">Registrar y Enviar Declaración</span>
+                                        <i data-lucide="loader-2" id="veh-spinner" class="w-5 h-5 ml-2 animate-spin hidden"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="w-full lg:w-1/3 space-y-6">
+                            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+                                <h3 class="font-bold text-gray-800 text-lg border-b pb-2 mb-4 flex items-center"><i data-lucide="headset" class="mr-2 text-aduanas-blue"></i> Asistencia en Línea</h3>
+                                <p class="text-sm text-gray-600 mb-4">Si tiene dudas sobre el llenado de este formulario, nuestros agentes están disponibles para asistirle.</p>
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex items-center text-gray-700">
+                                        <i data-lucide="phone" class="w-4 h-4 mr-3 text-gray-400"></i>
+                                        <span>600 400 0000 (OIRS)</span>
+                                    </div>
+                                    <div class="flex items-center text-gray-700">
+                                        <i data-lucide="mail" class="w-4 h-4 mr-3 text-gray-400"></i>
+                                        <a href="mailto:consultas@aduana.cl" class="text-aduanas-blue hover:underline">consultas@aduana.cl</a>
+                                    </div>
+                                    <div class="flex items-center text-gray-700">
+                                        <i data-lucide="message-square" class="w-4 h-4 mr-3 text-gray-400"></i>
+                                        <a href="#" class="text-aduanas-blue hover:underline">Chat en Vivo (Lun-Vie)</a>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-sm mb-1">Marca</label>
-                                <input type="text" class="w-full border rounded p-2">
+                            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 flex flex-col items-center justify-center relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-2 bg-aduanas-blue"></div>
+                                <div class="absolute top-2 left-0 w-full h-2 bg-aduanas-red"></div>
+                                <i data-lucide="shield-check" class="text-gray-400 w-24 h-24 mt-4 mb-2"></i>
+                                <p class="text-xs text-gray-500 font-medium tracking-widest uppercase">Gobierno de Chile</p>
                             </div>
-                            <div>
-                                <label class="block text-sm mb-1">Modelo</label>
-                                <input type="text" class="w-full border rounded p-2">
-                            </div>
-                            <div class="col-span-2 pt-4">
-                                <button type="submit"
-                                    class="bg-gray-600 text-white px-6 py-2 rounded font-bold hover:bg-black transition">Guardar</button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
 
@@ -384,6 +439,52 @@
                     showToast('Datos incorrectos', 'error');
                 }
             }, 1000);
+        }
+
+        function handleVehicleSubmit(e) {
+            e.preventDefault();
+            const pat = document.getElementById('veh-patente').value.trim();
+            const mar = document.getElementById('veh-marca').value.trim();
+            const mod = document.getElementById('veh-modelo').value.trim();
+            const pai = document.getElementById('veh-pais').value;
+
+            let hasErrors = false;
+
+            const checkField = (id, val) => {
+                if (!val) {
+                    document.getElementById(id).classList.add('border-red-500');
+                    document.getElementById('err-' + id).classList.remove('hidden');
+                    hasErrors = true;
+                } else {
+                    document.getElementById(id).classList.remove('border-red-500');
+                    document.getElementById('err-' + id).classList.add('hidden');
+                }
+            };
+
+            checkField('veh-patente', pat);
+            checkField('veh-marca', mar);
+            checkField('veh-modelo', mod);
+            checkField('veh-pais', pai);
+
+            if (hasErrors) {
+                showToast('Complete los campos obligatorios', 'error');
+                return;
+            }
+
+            const btnText = document.getElementById('veh-btn-text');
+            const spinner = document.getElementById('veh-spinner');
+
+            btnText.textContent = "Procesando...";
+            spinner.classList.remove('hidden');
+
+            setTimeout(() => {
+                btnText.textContent = "Registrar y Enviar Declaración";
+                spinner.classList.add('hidden');
+                
+                document.getElementById('form-vehicle').reset();
+                showToast('Declaración registrada e Impresión iniciada', 'success');
+                showSection('home');
+            }, 1500);
         }
 
         function toggleUserMenu() {
