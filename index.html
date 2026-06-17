@@ -69,22 +69,17 @@
             <h1 class="text-2xl font-bold text-center mb-2 text-aduanas-blue">Gestión Digital Aduanera</h1>
             <p class="text-gray-500 text-center mb-8">Paso Fronterizo Los Libertadores</p>
 
-            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
-                <p class="text-sm text-blue-700"><strong>Credenciales de Prototipo:</strong><br>Usuario: admin | Clave:
-                    1234</p>
-            </div>
-
             <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium mb-1">Usuario</label>
+                    <label class="block text-sm font-medium mb-1">Usuario / RUT</label>
                     <input type="text" id="user"
-                        class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                        class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-gray-400" placeholder="12.345.678-9 o admin">
                     <p id="error-user" class="text-red-600 text-sm mt-1 hidden">El usuario es requerido.</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1">Contraseña</label>
                     <input type="password" id="pass"
-                        class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                        class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-gray-400" placeholder="••••••••">
                     <p id="error-pass" class="text-red-600 text-sm mt-1 hidden">La contraseña es requerida.</p>
                 </div>
 
@@ -126,7 +121,7 @@
                                 <div class="bg-white text-aduanas-blue rounded-full p-1">
                                     <i data-lucide="user" class="w-5 h-5"></i>
                                 </div>
-                                <span class="font-medium" id="header-user-name">Usuario</span>
+                                <span class="font-medium" id="header-user-name">Fiscalizador</span>
                                 <i data-lucide="chevron-down" class="w-4 h-4"></i>
                             </div>
 
@@ -490,13 +485,16 @@
                 btnText.textContent = "Ingresar al Sistema";
                 spinner.classList.add('hidden');
 
-                if (u === 'admin' && p === 'admin123') {
-                    document.getElementById('view-login').classList.add('hidden');
-                    document.getElementById('app-layout').classList.remove('hidden');
-                    document.getElementById('btn-admin').classList.remove('hidden');
-                    lucide.createIcons();
-                    showToast('Sesión iniciada correctamente', 'success');
-                } else if (u === 'user' && p === '1234') {
+                if ((u === 'admin' && p === 'admin123') || (u === 'user' && p === '1234')) {
+                    let isAdmin = (u === 'admin');
+                    document.getElementById('header-user-name').textContent = isAdmin ? 'Administrador' : 'Fiscalizador';
+
+                    if (isAdmin) {
+                        document.getElementById('btn-admin').classList.remove('hidden');
+                    } else {
+                        document.getElementById('btn-admin').classList.add('hidden');
+                    }
+
                     document.getElementById('view-login').classList.add('hidden');
                     document.getElementById('app-layout').classList.remove('hidden');
                     lucide.createIcons();
