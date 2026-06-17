@@ -154,10 +154,6 @@
                         class="w-full flex items-center space-x-3 p-2 rounded hover:bg-gray-700 text-gray-300">
                         <i data-lucide="truck"></i> <span>Vehículos (CH-AR)</span>
                     </button>
-                    <button onclick="showSection('minors')" id="btn-minors"
-                        class="w-full flex items-center space-x-3 p-2 rounded hover:bg-gray-700 text-gray-300">
-                        <i data-lucide="users"></i> <span>Trámite Menores</span>
-                    </button>
                 </nav>
             </aside>
 
@@ -295,6 +291,39 @@
                                     </div>
                                 </div>
 
+                                <hr class="my-6">
+
+                                <div class="bg-blue-50 p-6 rounded-lg border border-blue-100">
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <input type="checkbox" id="check-menores" onchange="toggleMenoresUpload()" class="w-5 h-5 text-aduanas-blue rounded focus:ring-aduanas-blue accent-aduanas-blue">
+                                        <label for="check-menores" class="font-bold text-gray-800 text-lg cursor-pointer">Viaja con menores de edad</label>
+                                    </div>
+                                    <p class="text-sm text-gray-600 ml-8">Debe marcar esta casilla si viajan menores de 18 años.</p>
+
+                                    <div id="menores-upload-zone" class="hidden mt-6 ml-8 transition-all duration-300 origin-top opacity-0 transform -translate-y-2">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <h4 class="font-bold text-gray-800">Carga de Autorización Notarial</h4>
+                                            <div class="relative tooltip cursor-help">
+                                                <i data-lucide="help-circle" class="w-4 h-4 text-aduanas-blue"></i>
+                                                <span class="tooltip-text">Doc en PDF/JPG. No requiere legalización consular en convenio AR.</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="border-2 border-dashed border-aduanas-blue bg-white p-6 rounded-lg text-center hover:bg-gray-50 transition">
+                                            <i data-lucide="upload-cloud" class="w-10 h-10 text-aduanas-blue mx-auto mb-2"></i>
+                                            <p class="text-sm text-gray-500 mb-4">Arrastre el documento o haga clic para subir</p>
+                                            <input type="file" id="file-menor" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileUpload(event)">
+                                            <label for="file-menor" class="bg-gray-200 text-gray-800 font-medium px-4 py-2 rounded shadow-sm cursor-pointer hover:bg-gray-300 transition">
+                                                Seleccionar Archivo
+                                            </label>
+                                            <div id="file-name-display" class="mt-3 text-sm font-bold text-green-600 hidden flex items-center justify-center">
+                                                <i data-lucide="check-circle-2" class="w-4 h-4 mr-1"></i> <span id="file-name-text"></span>
+                                            </div>
+                                            <p class="text-red-600 text-xs mt-2 hidden font-medium" id="err-veh-file">Debe adjuntar la autorización notarial.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="pt-4 flex justify-end">
                                     <button type="submit" id="btn-submit-veh" class="bg-aduanas-blue text-white font-bold px-8 py-3 rounded-lg hover-bg-aduanas-blue transition shadow-lg flex items-center">
                                         <span id="veh-btn-text">Registrar y Enviar Declaración</span>
@@ -328,29 +357,6 @@
                                 <div class="absolute top-2 left-0 w-full h-2 bg-aduanas-red"></div>
                                 <i data-lucide="shield-check" class="text-gray-400 w-24 h-24 mt-4 mb-2"></i>
                                 <p class="text-xs text-gray-500 font-medium tracking-widest uppercase">Gobierno de Chile</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="sec-minors" class="hidden space-y-6">
-                    <h2 class="text-2xl font-bold text-gray-800">Control de Menores de Edad</h2>
-                    <div class="bg-white p-8 rounded-lg shadow max-w-2xl border-2 border-dashed border-gray-300">
-                        <div class="text-center space-y-4">
-                            <i data-lucide="file-up" class="w-12 h-12 mx-auto text-gray-400"></i>
-                            <div>
-                                <h3 class="font-bold text-lg">Carga de Autorización Notarial</h3>
-                                <p class="text-gray-500 text-sm">Obligatorio si el menor viaja sin uno de los padres</p>
-                            </div>
-                            <input type="file" id="minor-file" class="hidden">
-                            <label for="minor-file"
-                                class="inline-block bg-gray-200 text-gray-700 px-4 py-2 rounded cursor-pointer hover:bg-gray-300 border border-gray-400">
-                                Seleccionar PDF / Imagen
-                            </label>
-                            <div class="mt-4 pt-4 border-t">
-
-                                <button type="button" class="text-blue-500 font-bold hover:underline">Subir
-                                    ahora</button>
                             </div>
                         </div>
                     </div>
@@ -441,12 +447,50 @@
             }, 1000);
         }
 
+        let fileUploaded = false;
+
+        function toggleMenoresUpload() {
+            const isChecked = document.getElementById('check-menores').checked;
+            const uploadZone = document.getElementById('menores-upload-zone');
+
+            if (isChecked) {
+                uploadZone.classList.remove('hidden');
+                void uploadZone.offsetWidth;
+                uploadZone.classList.remove('opacity-0', '-translate-y-2');
+                uploadZone.classList.add('opacity-100', 'translate-y-0');
+            } else {
+                uploadZone.classList.remove('opacity-100', 'translate-y-0');
+                uploadZone.classList.add('opacity-0', '-translate-y-2');
+                setTimeout(() => {
+                    if (!document.getElementById('check-menores').checked) {
+                        uploadZone.classList.add('hidden');
+                        document.getElementById('file-menor').value = '';
+                        fileUploaded = false;
+                        document.getElementById('file-name-display').classList.add('hidden');
+                        document.getElementById('err-veh-file').classList.add('hidden');
+                    }
+                }, 300);
+            }
+        }
+
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('file-name-text').textContent = file.name;
+                document.getElementById('file-name-display').classList.remove('hidden');
+                document.getElementById('err-veh-file').classList.add('hidden');
+                fileUploaded = true;
+                showToast('Archivo preparado para subir: ' + file.name, 'success');
+            }
+        }
+
         function handleVehicleSubmit(e) {
             e.preventDefault();
             const pat = document.getElementById('veh-patente').value.trim();
             const mar = document.getElementById('veh-marca').value.trim();
             const mod = document.getElementById('veh-modelo').value.trim();
             const pai = document.getElementById('veh-pais').value;
+            const checkMenores = document.getElementById('check-menores');
 
             let hasErrors = false;
 
@@ -466,8 +510,13 @@
             checkField('veh-modelo', mod);
             checkField('veh-pais', pai);
 
+            if (checkMenores.checked && !fileUploaded) {
+                document.getElementById('err-veh-file').classList.remove('hidden');
+                hasErrors = true;
+            }
+
             if (hasErrors) {
-                showToast('Complete los campos obligatorios', 'error');
+                showToast('Por favor, corrija los errores en el formulario.', 'error');
                 return;
             }
 
@@ -476,13 +525,19 @@
 
             btnText.textContent = "Procesando...";
             spinner.classList.remove('hidden');
+            document.getElementById('btn-submit-veh').disabled = true;
 
             setTimeout(() => {
                 btnText.textContent = "Registrar y Enviar Declaración";
                 spinner.classList.add('hidden');
+                document.getElementById('btn-submit-veh').disabled = false;
                 
-                document.getElementById('form-vehicle').reset();
                 showToast('Declaración registrada e Impresión iniciada', 'success');
+
+                e.target.reset();
+                fileUploaded = false;
+                document.getElementById('file-name-display').classList.add('hidden');
+                toggleMenoresUpload();
                 showSection('home');
             }, 1500);
         }
@@ -501,7 +556,7 @@
         }
 
         function showSection(id) {
-            const sections = ['home', 'vehicles', 'minors'];
+            const sections = ['home', 'vehicles'];
             sections.forEach(s => {
                 const el = document.getElementById('sec-' + s);
                 const btn = document.getElementById('btn-' + s);
