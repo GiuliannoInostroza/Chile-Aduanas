@@ -1,645 +1,892 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chile Aduanas - Prototipo V1</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 16px;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Gestión Digital Aduanera V2</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 16px;
+    }
 
-        .bg-aduanas-blue {
-            background-color: #0033a0;
-        }
 
-        .text-aduanas-blue {
-            color: #0033a0;
-        }
+    .bg-aduanas-blue {
+      background-color: #0033a0;
+    }
 
-        .border-aduanas-blue {
-            border-color: #0033a0;
-        }
+    .text-aduanas-blue {
+      color: #0033a0;
+    }
 
-        .hover-bg-aduanas-blue:hover {
-            background-color: #002277;
-        }
+    .border-aduanas-blue {
+      border-color: #0033a0;
+    }
 
-        .bg-aduanas-red {
-            background-color: #e03c31;
-        }
+    .hover-bg-aduanas-blue:hover {
+      background-color: #002277;
+    }
 
-        .text-aduanas-red {
-            color: #e03c31;
-        }
+    .bg-aduanas-red {
+      background-color: #e03c31;
+    }
 
-        .tooltip .tooltip-text {
-            visibility: hidden;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px 0;
-            position: absolute;
-            z-index: 50;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
 
-        .tooltip:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-        }
-    </style>
+    .fade-in {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      padding: 5px 10px;
+      border-radius: 6px;
+      position: absolute;
+      z-index: 50;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.875rem;
+      white-space: nowrap;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .tooltip .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #333 transparent transparent transparent;
+    }
+
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+
+
+    input[type="file"] {
+      display: none;
+    }
+  </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen text-gray-800">
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
 
-    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3"></div>
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3"></div>
 
-    <div id="view-login" class="min-h-screen flex flex-col items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md border-t-4 border-aduanas-blue">
-            <h1 class="text-2xl font-bold text-center mb-2 text-aduanas-blue">Gestión Digital Aduanera</h1>
-            <p class="text-gray-500 text-center mb-8">Paso Fronterizo Los Libertadores</p>
+  <div id="view-login"
+    class="min-h-screen flex items-center justify-center p-4 bg-[url('https://images.unsplash.com/photo-1576487248805-fcb8d14db0b8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center">
+    <div class="absolute inset-0 bg-black bg-opacity-60"></div>
+    <div class="relative bg-white p-8 rounded-xl shadow-2xl w-full max-w-md border-t-8 border-aduanas-blue fade-in">
+      <div class="flex justify-center mb-6">
+        <img src="./def-removebg-preview.webp" alt="Logo Aduanas Chile" class="h-24 object-contain">
+      </div>
+      <h1 class="text-2xl font-bold text-center text-aduanas-blue mb-8">Portal de Gestión Aduanera</h1>
 
-            <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Usuario / RUT</label>
-                    <input type="text" id="user"
-                        class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-gray-400" placeholder="12.345.678-9 o admin">
-                    <p id="error-user" class="text-red-600 text-sm mt-1 hidden">El usuario es requerido.</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1">Contraseña</label>
-                    <input type="password" id="pass"
-                        class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-gray-400" placeholder="••••••••">
-                    <p id="error-pass" class="text-red-600 text-sm mt-1 hidden">La contraseña es requerida.</p>
-                </div>
-
-                <button type="submit" id="btn-login-submit"
-                    class="w-full bg-aduanas-blue text-white font-bold py-2 rounded hover-bg-aduanas-blue transition flex justify-center items-center">
-                    <span id="login-btn-text">Ingresar al Sistema</span>
-                    <i data-lucide="loader-2" id="login-spinner" class="w-5 h-5 ml-2 animate-spin hidden"></i>
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <div id="app-layout" class="hidden min-h-screen flex flex-col">
-
-        <header class="bg-aduanas-blue text-white shadow-md relative z-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16 items-center">
-                    <div class="flex items-center space-x-4">
-                        <i data-lucide="shield-check" class="text-white w-8 h-8"></i>
-                        <span class="font-bold text-xl tracking-wide hidden sm:block">Servicio Nacional de Aduanas</span>
-                    </div>
-
-                    <div class="flex items-center space-x-6 relative">
-                        <div class="relative group cursor-pointer tooltip">
-                            <i data-lucide="bell" class="w-6 h-6 hover:text-gray-300 transition"></i>
-                            <span class="absolute top-0 right-0 -mt-1 -mr-1 flex h-3 w-3">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                            </span>
-                            <div class="tooltip-text hidden group-hover:block w-48 text-left !left-auto !right-0 !transform-none !bottom-auto !top-full mt-2 bg-white text-gray-800 border shadow-xl p-3">
-                                <p class="font-bold border-b pb-1 mb-2">Notificaciones</p>
-                                <p class="text-xs">✔ Trámite #451 aprobado.</p>
-                                <p class="text-xs mt-1">⚠ Actualización de políticas.</p>
-                            </div>
-                        </div>
-
-                        <div class="relative cursor-pointer" id="user-menu-btn" onclick="toggleUserMenu()">
-                            <div class="flex items-center space-x-2 hover:bg-[#002277] p-2 rounded transition">
-                                <div class="bg-white text-aduanas-blue rounded-full p-1">
-                                    <i data-lucide="user" class="w-5 h-5"></i>
-                                </div>
-                                <span class="font-medium" id="header-user-name">Fiscalizador</span>
-                                <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                            </div>
-
-                            <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"><i data-lucide="settings" class="w-4 h-4 mr-2"></i> Ajustes de Perfil</a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"><i data-lucide="help-circle" class="w-4 h-4 mr-2"></i> Ayuda</a>
-                                <hr class="my-1">
-                                <a href="#" onclick="logout()" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center"><i data-lucide="log-out" class="w-4 h-4 mr-2"></i> Cerrar Sesión</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      <form id="form-login" onsubmit="handleLogin(event)" class="space-y-5">
+        <div>
+          <label for="login-user" class="block text-sm font-bold text-gray-700 mb-1">Usuario / RUT</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i data-lucide="user" class="w-5 h-5 text-gray-400"></i>
             </div>
-        </header>
-
-        <div class="flex flex-1">
-
-            <aside class="w-64 bg-gray-800 text-white p-6 space-y-6">
-                <nav class="space-y-2">
-                    <button onclick="showSection('home')" id="btn-home"
-                        class="w-full flex items-center space-x-3 p-2 rounded bg-gray-700 text-white">
-                        <i data-lucide="layout-dashboard"></i> <span>Dashboard</span>
-                    </button>
-                    <button onclick="showSection('vehicles')" id="btn-vehicles"
-                        class="w-full flex items-center space-x-3 p-2 rounded hover:bg-gray-700 text-gray-300">
-                        <i data-lucide="truck"></i> <span>Vehículos (CH-AR)</span>
-                    </button>
-                    <button onclick="showSection('admin')" id="btn-admin" class="hidden w-full flex items-center space-x-3 p-2 rounded hover:bg-gray-700 text-gray-300">
-                        <i data-lucide="users"></i> <span>Administración</span>
-                    </button>
-                </nav>
-            </aside>
-
-            <main class="flex-1 p-10 bg-gray-50 overflow-y-auto">
-
-                <div id="sec-home" class="space-y-8">
-                    <div>
-                        <h2 class="text-3xl font-black text-gray-800 mb-2">Trámites Disponibles</h2>
-                        <p class="text-gray-600">Seleccione el tipo de declaración que desea realizar.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 flex flex-col hover:shadow-lg transition relative overflow-hidden">
-                            <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">COSTO: $0</div>
-                            <div class="flex items-center space-x-3 mb-4">
-                                <div class="bg-blue-100 p-3 rounded-full text-aduanas-blue">
-                                    <i data-lucide="car" class="w-6 h-6"></i>
-                                </div>
-                                <h3 class="text-lg font-bold text-gray-800 leading-tight">Salida y Admisión Temporal de Vehículos</h3>
-                            </div>
-                            <p class="text-gray-600 text-sm mb-4 flex-1">Acuerdo Chileno-Argentino. Declaración para el cruce de vehículos por el Paso Los Libertadores.</p>
-                            <div class="grid grid-cols-2 gap-2 mt-auto">
-                                <button onclick="showSection('vehicles')" class="bg-white border border-aduanas-blue text-aduanas-blue text-sm font-bold py-2 rounded text-center hover:bg-blue-50 transition">Ingreso</button>
-                                <button onclick="showSection('vehicles')" class="bg-white border border-aduanas-blue text-aduanas-blue text-sm font-bold py-2 rounded text-center hover:bg-blue-50 transition">Salida</button>
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 flex flex-col hover:shadow-lg transition relative overflow-hidden">
-                            <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">COSTO: $0</div>
-                            <div class="flex items-center space-x-3 mb-4">
-                                <div class="bg-green-100 p-3 rounded-full text-green-600">
-                                    <i data-lucide="apple" class="w-6 h-6"></i>
-                                </div>
-                                <h3 class="text-lg font-bold text-gray-800 leading-tight">Declaración Jurada SAG y Aduanas</h3>
-                            </div>
-                            <p class="text-gray-600 text-sm mb-4 flex-1">Para ingreso de equipaje y alimentos por pasos fronterizos terrestres CH-AR.</p>
-                            <div class="grid grid-cols-2 gap-2 mt-auto">
-                                <button onclick="showSection('vehicles')" class="bg-aduanas-blue text-white text-sm font-bold py-2 rounded text-center hover-bg-aduanas-blue transition shadow">Ingreso</button>
-                                <button onclick="showSection('vehicles')" class="bg-aduanas-blue text-white text-sm font-bold py-2 rounded text-center hover-bg-aduanas-blue transition shadow">Salida</button>
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 flex flex-col hover:shadow-lg transition">
-                            <div class="flex items-center space-x-3 mb-4">
-                                <div class="bg-purple-100 p-3 rounded-full text-purple-600">
-                                    <i data-lucide="award" class="w-6 h-6"></i>
-                                </div>
-                                <h3 class="text-lg font-bold text-gray-800 leading-tight">Título de Salida Temporal (Placa de Gracia)</h3>
-                            </div>
-                            <p class="text-gray-600 text-sm mb-4 flex-1">Exclusivo para vehículos diplomáticos (C.D., C.C., A.T.) y misiones oficiales.</p>
-                            <div class="grid grid-cols-2 gap-2 mt-auto">
-                                <button onclick="showSection('vehicles')" class="bg-white border border-aduanas-blue text-aduanas-blue text-sm font-bold py-2 rounded text-center hover:bg-blue-50 transition">Ingreso</button>
-                                <button onclick="showSection('vehicles')" class="bg-white border border-aduanas-blue text-aduanas-blue text-sm font-bold py-2 rounded text-center hover:bg-blue-50 transition">Salida</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-10 mb-8 border-t pt-8">
-                        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center"><i data-lucide="newspaper" class="mr-2"></i> Noticias Paso Los Libertadores</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden group cursor-pointer">
-                                <div class="h-32 bg-gray-200 bg-[url('https://static.emol.cl/emol50/Fotos/2023/09/21/file_20230921155711.jpg')] bg-cover bg-center transition-transform group-hover:scale-105"></div>
-                                <div class="p-4 relative bg-white z-10">
-                                    <span class="text-xs font-bold text-aduanas-blue mb-1 block">Operativo</span>
-                                    <h4 class="font-bold text-gray-800 leading-tight">Estado de Ruta 60-CH y Complejo Los Libertadores</h4>
-                                </div>
-                            </div>
-                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden group cursor-pointer">
-                                <div class="h-32 bg-gray-200 bg-[url('https://www.pasosfronterizos.gov.cl/media/2022/10/Captura.jpg')] bg-cover bg-center transition-transform group-hover:scale-105"></div>
-                                <div class="p-4 relative bg-white z-10">
-                                    <span class="text-xs font-bold text-aduanas-blue mb-1 block">Fronteras</span>
-                                    <h4 class="font-bold text-gray-800 leading-tight">Aduanas incauta contrabando en frontera chileno-argentina</h4>
-                                </div>
-                            </div>
-                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden group cursor-pointer">
-                                <div class="h-32 bg-gray-200 bg-[url('https://dpplosandes.dpp.gob.cl/media/2022/08/Paso-Fronterizo-Los-Libertadores-vuelve-a-permitir-el-transito-de-vehiculos-este-jueves-18-de-agosto-de-2022-1024x512-1-894x512.png')] bg-cover bg-center transition-transform group-hover:scale-105"></div>
-                                <div class="p-4 relative bg-white z-10">
-                                    <span class="text-xs font-bold text-aduanas-blue mb-1 block">Institucional</span>
-                                    <h4 class="font-bold text-gray-800 leading-tight">Nuevos horarios de atención en Paso Los Libertadores invierno 2026</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="sec-vehicles" class="hidden fade-in">
-                    <div class="flex flex-col lg:flex-row gap-8">
-                        <div class="w-full lg:w-2/3 bg-white p-8 rounded-xl shadow-md border border-gray-200">
-                            <h2 class="text-2xl font-black text-gray-800 mb-2 border-b pb-4">Declaración de Vehículo (Acuerdo CH-AR)</h2>
-                            <p class="text-gray-500 text-sm mb-4 mt-2">Complete todos los datos. Los campos marcados con asterisco (*) son obligatorios.</p>
-
-                            <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-r-lg">
-                                <div class="flex">
-                                    <div class="flex-shrink-0">
-                                        <i data-lucide="printer" class="h-5 w-5 text-green-500"></i>
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="text-sm text-green-700 font-bold">Impresión Automática (Acuerdo CH-AR)</p>
-                                        <p class="text-sm text-green-600">Al procesar la declaración, se generarán automáticamente las 2 copias requeridas por el servicio.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <form id="form-vehicle" onsubmit="handleVehicleSubmit(event)" class="space-y-6">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <div class="flex items-center justify-between mb-1">
-                                            <label for="veh-patente" class="block text-sm font-bold text-gray-700">Patente *</label>
-                                            <div class="relative tooltip cursor-help">
-                                                <i data-lucide="help-circle" class="w-4 h-4 text-aduanas-blue"></i>
-                                                <span class="tooltip-text">Sin guiones ni espacios. Ej: ABCD12</span>
-                                            </div>
-                                        </div>
-                                        <input type="text" id="veh-patente" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-aduanas-blue transition">
-                                        <p class="text-red-600 text-xs mt-1 hidden font-medium" id="err-veh-patente">La patente es obligatoria.</p>
-                                    </div>
-                                    <div>
-                                        <label for="veh-marca" class="block text-sm font-bold text-gray-700 mb-1">Marca *</label>
-                                        <input type="text" id="veh-marca" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-aduanas-blue transition">
-                                        <p class="text-red-600 text-xs mt-1 hidden font-medium" id="err-veh-marca">La marca es obligatoria.</p>
-                                    </div>
-                                    <div>
-                                        <label for="veh-modelo" class="block text-sm font-bold text-gray-700 mb-1">Modelo *</label>
-                                        <input type="text" id="veh-modelo" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-aduanas-blue transition">
-                                        <p class="text-red-600 text-xs mt-1 hidden font-medium" id="err-veh-modelo">El modelo es obligatorio.</p>
-                                    </div>
-                                    <div>
-                                        <label for="veh-pais" class="block text-sm font-bold text-gray-700 mb-1">País de Procedencia *</label>
-                                        <select id="veh-pais" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-aduanas-blue transition">
-                                            <option value="">-- Seleccione País --</option>
-                                            <option value="CL">Chile</option>
-                                            <option value="AR">Argentina</option>
-                                        </select>
-                                        <p class="text-red-600 text-xs mt-1 hidden font-medium" id="err-veh-pais">Seleccione un país válido.</p>
-                                    </div>
-                                </div>
-
-                                <hr class="my-6">
-
-                                <div class="bg-blue-50 p-6 rounded-lg border border-blue-100">
-                                    <div class="flex items-center space-x-3 mb-2">
-                                        <input type="checkbox" id="check-menores" onchange="toggleMenoresUpload()" class="w-5 h-5 text-aduanas-blue rounded focus:ring-aduanas-blue accent-aduanas-blue">
-                                        <label for="check-menores" class="font-bold text-gray-800 text-lg cursor-pointer">Viaja con menores de edad</label>
-                                    </div>
-                                    <p class="text-sm text-gray-600 ml-8">Debe marcar esta casilla si viajan menores de 18 años.</p>
-
-                                    <div id="menores-upload-zone" class="hidden mt-6 ml-8 transition-all duration-300 origin-top opacity-0 transform -translate-y-2">
-                                        <div class="flex justify-between items-center mb-2">
-                                            <h4 class="font-bold text-gray-800">Carga de Autorización Notarial</h4>
-                                            <div class="relative tooltip cursor-help">
-                                                <i data-lucide="help-circle" class="w-4 h-4 text-aduanas-blue"></i>
-                                                <span class="tooltip-text">Doc en PDF/JPG. No requiere legalización consular en convenio AR.</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="border-2 border-dashed border-aduanas-blue bg-white p-6 rounded-lg text-center hover:bg-gray-50 transition">
-                                            <i data-lucide="upload-cloud" class="w-10 h-10 text-aduanas-blue mx-auto mb-2"></i>
-                                            <p class="text-sm text-gray-500 mb-4">Arrastre el documento o haga clic para subir</p>
-                                            <input type="file" id="file-menor" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileUpload(event)">
-                                            <label for="file-menor" class="bg-gray-200 text-gray-800 font-medium px-4 py-2 rounded shadow-sm cursor-pointer hover:bg-gray-300 transition">
-                                                Seleccionar Archivo
-                                            </label>
-                                            <div id="file-name-display" class="mt-3 text-sm font-bold text-green-600 hidden flex items-center justify-center">
-                                                <i data-lucide="check-circle-2" class="w-4 h-4 mr-1"></i> <span id="file-name-text"></span>
-                                            </div>
-                                            <p class="text-red-600 text-xs mt-2 hidden font-medium" id="err-veh-file">Debe adjuntar la autorización notarial.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="pt-4 flex justify-end">
-                                    <button type="submit" id="btn-submit-veh" class="bg-aduanas-blue text-white font-bold px-8 py-3 rounded-lg hover-bg-aduanas-blue transition shadow-lg flex items-center">
-                                        <span id="veh-btn-text">Registrar y Enviar Declaración</span>
-                                        <i data-lucide="loader-2" id="veh-spinner" class="w-5 h-5 ml-2 animate-spin hidden"></i>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-
-                        <div class="w-full lg:w-1/3 space-y-6">
-                            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
-                                <h3 class="font-bold text-gray-800 text-lg border-b pb-2 mb-4 flex items-center"><i data-lucide="headset" class="mr-2 text-aduanas-blue"></i> Asistencia en Línea</h3>
-                                <p class="text-sm text-gray-600 mb-4">Si tiene dudas sobre el llenado de este formulario, nuestros agentes están disponibles para asistirle.</p>
-                                <div class="space-y-3 text-sm">
-                                    <div class="flex items-center text-gray-700">
-                                        <i data-lucide="phone" class="w-4 h-4 mr-3 text-gray-400"></i>
-                                        <span>600 400 0000 (OIRS)</span>
-                                    </div>
-                                    <div class="flex items-center text-gray-700">
-                                        <i data-lucide="mail" class="w-4 h-4 mr-3 text-gray-400"></i>
-                                        <a href="mailto:consultas@aduana.cl" class="text-aduanas-blue hover:underline">consultas@aduana.cl</a>
-                                    </div>
-                                    <div class="flex items-center text-gray-700">
-                                        <i data-lucide="message-square" class="w-4 h-4 mr-3 text-gray-400"></i>
-                                        <a href="#" class="text-aduanas-blue hover:underline">Chat en Vivo (Lun-Vie)</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 flex flex-col items-center justify-center relative overflow-hidden">
-                                <div class="absolute top-0 left-0 w-full h-2 bg-aduanas-blue"></div>
-                                <div class="absolute top-2 left-0 w-full h-2 bg-aduanas-red"></div>
-                                <i data-lucide="shield-check" class="text-gray-400 w-24 h-24 mt-4 mb-2"></i>
-                                <p class="text-xs text-gray-500 font-medium tracking-widest uppercase">Gobierno de Chile</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="sec-admin" class="hidden fade-in space-y-6">
-                    <div class="flex justify-between items-end mb-6 border-b pb-4">
-                        <div>
-                            <h2 class="text-3xl font-black text-gray-800 mb-1">Gestión de Usuarios</h2>
-                            <p class="text-gray-600">Panel de administración seguro con enmascaramiento de datos personales.</p>
-                        </div>
-                        <button class="bg-aduanas-blue text-white px-4 py-2 rounded shadow hover-bg-aduanas-blue font-bold flex items-center">
-                            <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i> Nuevo Fiscalizador
-                        </button>
-                    </div>
-
-                    <div class="bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden">
-                        <table class="min-w-full divide-y divide-gray-200 text-sm">
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th scope="col" class="px-6 py-4 text-left font-bold text-gray-700 uppercase tracking-wider">ID / Username</th>
-                                    <th scope="col" class="px-6 py-4 text-left font-bold text-gray-700 uppercase tracking-wider">Rol</th>
-                                    <th scope="col" class="px-6 py-4 text-left font-bold text-gray-700 uppercase tracking-wider">Último Acceso</th>
-                                    <th scope="col" class="px-6 py-4 text-right font-bold text-gray-700 uppercase tracking-wider">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="font-bold text-gray-800">m.salinas***</div>
-                                        <div class="text-xs text-gray-500">12.***.***-K</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap"><span class="bg-blue-100 text-aduanas-blue px-2 py-1 rounded-full text-xs font-bold">Fiscalizador</span></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500">Hace 2 horas</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right font-medium space-x-3">
-                                        <button class="text-blue-600 hover:text-blue-900" title="Modificar Roles"><i data-lucide="edit" class="w-4 h-4"></i></button>
-                                        <button class="text-red-600 hover:text-red-900" title="Eliminar Acceso" onclick="confirmDelete()"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="font-bold text-gray-800">p.gonzalez***</div>
-                                        <div class="text-xs text-gray-500">15.***.***-2</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap"><span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-bold">Auditor</span></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500">Hace 1 día</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right font-medium space-x-3">
-                                        <button class="text-blue-600 hover:text-blue-900"><i data-lucide="edit" class="w-4 h-4"></i></button>
-                                        <button class="text-red-600 hover:text-red-900" onclick="confirmDelete()"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </main>
+            <input type="text" id="login-user"
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-aduanas-blue focus:border-aduanas-blue transition"
+              placeholder="12.345.678-9 o admin">
+          </div>
+          <p id="error-login-user" class="text-red-600 text-sm mt-1 hidden">El usuario es requerido.</p>
         </div>
+
+        <div>
+          <label for="login-pass" class="block text-sm font-bold text-gray-700 mb-1">Contraseña</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i data-lucide="lock" class="w-5 h-5 text-gray-400"></i>
+            </div>
+            <input type="password" id="login-pass"
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-aduanas-blue focus:border-aduanas-blue transition"
+              placeholder="••••••••">
+          </div>
+          <p id="error-login-pass" class="text-red-600 text-sm mt-1 hidden">La contraseña es requerida.</p>
+        </div>
+
+        <button type="submit" id="btn-login-submit"
+          class="w-full bg-aduanas-blue text-white font-bold py-3 rounded-lg hover-bg-aduanas-blue transition shadow-lg flex justify-center items-center">
+          <span id="login-btn-text">Ingresar al Sistema</span>
+          <i data-lucide="loader-2" id="login-spinner" class="w-5 h-5 ml-2 animate-spin hidden"></i>
+        </button>
+      </form>
+
+      <div class="mt-6 text-center text-sm text-gray-500">
+        <p>Para probar Admin Panel: usuario <strong>admin</strong></p>
+        <p>Para usuario normal: cualquier otro valor</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="app-layout" class="hidden flex-col min-h-screen">
+
+    <header class="bg-aduanas-blue text-white shadow-md relative z-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          <div class="flex items-center space-x-4">
+            <img src="./def-removebg-preview.webp" alt="Logo Aduanas" class="h-10 bg-white p-1 rounded">
+            <span class="font-bold text-xl tracking-wide hidden sm:block">Servicio Nacional de Aduanas</span>
+          </div>
+
+          <div class="flex items-center space-x-6 relative">
+
+            <div class="relative group cursor-pointer tooltip">
+              <i data-lucide="bell" class="w-6 h-6 hover:text-gray-300 transition"></i>
+              <span class="absolute top-0 right-0 -mt-1 -mr-1 flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+              </span>
+              <div
+                class="tooltip-text hidden group-hover:block w-48 text-left !left-auto !right-0 !transform-none !bottom-auto !top-full mt-2 bg-white text-gray-800 border shadow-xl p-3">
+                <p class="font-bold border-b pb-1 mb-2">Notificaciones</p>
+                <p class="text-xs">✔ Trámite #451 aprobado.</p>
+                <p class="text-xs mt-1">⚠ Actualización de políticas.</p>
+              </div>
+            </div>
+
+            <div class="relative cursor-pointer" id="user-menu-btn" onclick="toggleUserMenu()">
+              <div class="flex items-center space-x-2 hover:bg-[#002277] p-2 rounded transition">
+                <div class="bg-white text-aduanas-blue rounded-full p-1">
+                  <i data-lucide="user" class="w-5 h-5"></i>
+                </div>
+                <span class="font-medium" id="header-user-name">Usuario</span>
+                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+              </div>
+
+              <div id="user-dropdown"
+                class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"><i
+                    data-lucide="settings" class="w-4 h-4 mr-2"></i> Ajustes de Perfil</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"><i
+                    data-lucide="help-circle" class="w-4 h-4 mr-2"></i> Ayuda</a>
+                <hr class="my-1">
+                <a href="#" onclick="logout()"
+                  class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center"><i
+                    data-lucide="log-out" class="w-4 h-4 mr-2"></i> Cerrar Sesión</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex flex-1 max-w-7xl w-full mx-auto sm:px-6 lg:px-8 py-6">
+
+      <aside class="w-64 bg-white rounded-lg shadow-sm border border-gray-200 mr-6 h-fit overflow-hidden">
+        <nav class="flex flex-col">
+          <button onclick="showSection('home')" id="nav-home"
+            class="flex items-center space-x-3 px-6 py-4 text-left border-l-4 border-aduanas-blue bg-blue-50 text-aduanas-blue font-bold transition">
+            <i data-lucide="home" class="w-5 h-5"></i>
+            <span>Inicio</span>
+          </button>
+          <button onclick="showSection('vehicles')" id="nav-vehicles"
+            class="flex items-center space-x-3 px-6 py-4 text-left border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:text-aduanas-blue transition">
+            <i data-lucide="car" class="w-5 h-5"></i>
+            <span>Trámites Vehículos</span>
+          </button>
+
+          <button onclick="showSection('admin')" id="nav-admin"
+            class="hidden items-center space-x-3 px-6 py-4 text-left border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:text-aduanas-blue transition">
+            <i data-lucide="users" class="w-5 h-5"></i>
+            <span>Administración</span>
+          </button>
+        </nav>
+      </aside>
+
+      <main class="flex-1 bg-transparent">
+
+        <div id="sec-home" class="fade-in space-y-8">
+
+          <div>
+            <h2 class="text-3xl font-black text-gray-800 mb-2">Trámites Disponibles</h2>
+            <p class="text-gray-600">Seleccione el tipo de declaración que desea realizar.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <div
+              class="bg-white rounded-xl shadow-md border border-gray-200 p-6 flex flex-col hover:shadow-lg transition relative overflow-hidden">
+              <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                COSTO: $0</div>
+              <div class="flex items-center space-x-3 mb-4">
+                <div class="bg-blue-100 p-3 rounded-full text-aduanas-blue">
+                  <i data-lucide="car" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 leading-tight">Salida y Admisión Temporal de Vehículos</h3>
+              </div>
+              <p class="text-gray-600 text-sm mb-4 flex-1">Acuerdo Chileno-Argentino. Declaración para el cruce de
+                vehículos por el Paso Los Libertadores.</p>
+              <div class="grid grid-cols-2 gap-2 mt-auto">
+                <button onclick="showSection('vehicles')"
+                  class="bg-white border border-aduanas-blue text-aduanas-blue text-sm font-bold py-2 rounded text-center hover:bg-blue-50 transition">Ingreso</button>
+                <button onclick="showSection('vehicles')"
+                  class="bg-white border border-aduanas-blue text-aduanas-blue text-sm font-bold py-2 rounded text-center hover:bg-blue-50 transition">Salida</button>
+              </div>
+            </div>
+
+            <div
+              class="bg-white rounded-xl shadow-md border border-gray-200 p-6 flex flex-col hover:shadow-lg transition relative overflow-hidden">
+              <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                COSTO: $0</div>
+              <div class="flex items-center space-x-3 mb-4">
+                <div class="bg-green-100 p-3 rounded-full text-green-600">
+                  <i data-lucide="apple" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 leading-tight">Declaración Jurada SAG y Aduanas</h3>
+              </div>
+              <p class="text-gray-600 text-sm mb-4 flex-1">Para ingreso de equipaje y alimentos por pasos fronterizos
+                terrestres CH-AR.</p>
+              <div class="grid grid-cols-2 gap-2 mt-auto">
+                <button onclick="showSection('vehicles')"
+                  class="bg-aduanas-blue text-white text-sm font-bold py-2 rounded text-center hover-bg-aduanas-blue transition shadow">Ingreso</button>
+                <button onclick="showSection('vehicles')"
+                  class="bg-aduanas-blue text-white text-sm font-bold py-2 rounded text-center hover-bg-aduanas-blue transition shadow">Salida</button>
+              </div>
+            </div>
+
+            <div
+              class="bg-white rounded-xl shadow-md border border-gray-200 p-6 flex flex-col hover:shadow-lg transition">
+              <div class="flex items-center space-x-3 mb-4">
+                <div class="bg-purple-100 p-3 rounded-full text-purple-600">
+                  <i data-lucide="award" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 leading-tight">Título de Salida Temporal (Placa de Gracia)
+                </h3>
+              </div>
+              <p class="text-gray-600 text-sm mb-4 flex-1">Exclusivo para vehículos diplomáticos (C.D., C.C., A.T.) y
+                misiones oficiales.</p>
+              <div class="grid grid-cols-2 gap-2 mt-auto">
+                <button onclick="showSection('vehicles')"
+                  class="bg-white border border-aduanas-blue text-aduanas-blue text-sm font-bold py-2 rounded text-center hover:bg-blue-50 transition">Ingreso</button>
+                <button onclick="showSection('vehicles')"
+                  class="bg-white border border-aduanas-blue text-aduanas-blue text-sm font-bold py-2 rounded text-center hover:bg-blue-50 transition">Salida</button>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="mt-10">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Mis Trámites Recientes</h2>
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
+              <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th scope="col" class="px-6 py-3 text-left font-bold text-gray-500 uppercase tracking-wider">ID
+                      Trámite</th>
+                    <th scope="col" class="px-6 py-3 text-left font-bold text-gray-500 uppercase tracking-wider">Tipo
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left font-bold text-gray-500 uppercase tracking-wider">Fecha
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left font-bold text-gray-500 uppercase tracking-wider">Estado
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-right font-bold text-gray-500 uppercase tracking-wider">Acción
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap font-mono font-medium text-aduanas-blue">#PFL-2026-8942</td>
+                    <td class="px-6 py-4 whitespace-nowrap">Ingreso SAG/Aduanas</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-500">12 Jun 2026</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span
+                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Aprobado</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right font-medium">
+                      <a href="#" class="text-aduanas-blue hover:text-blue-900"><i data-lucide="download"
+                          class="w-4 h-4 inline"></i></a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap font-mono font-medium text-aduanas-blue">#PFL-2026-9103</td>
+                    <td class="px-6 py-4 whitespace-nowrap">Salida Temp. Vehículo</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-500">14 Jun 2026</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span
+                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">En
+                        Revisión</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right font-medium">
+                      <a href="#" class="text-aduanas-blue hover:text-blue-900"><i data-lucide="eye"
+                          class="w-4 h-4 inline"></i></a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="mt-10 mb-8 border-t pt-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center"><i data-lucide="newspaper"
+                class="mr-2"></i> Noticias Paso Los Libertadores</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden group cursor-pointer">
+                <div
+                  class="h-32 bg-gray-200 bg-[url('https://static.emol.cl/emol50/Fotos/2023/09/21/file_20230921155711.jpg')] bg-cover bg-center transition-transform group-hover:scale-105">
+                </div>
+                <div class="p-4 relative bg-white z-10">
+                  <span class="text-xs font-bold text-aduanas-blue mb-1 block">Operativo</span>
+                  <h4 class="font-bold text-gray-800 leading-tight">Estado de Ruta 60-CH y Complejo Los Libertadores
+                  </h4>
+                </div>
+              </div>
+              <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden group cursor-pointer">
+                <div
+                  class="h-32 bg-gray-200 bg-[url('https://www.pasosfronterizos.gov.cl/media/2022/10/Captura.jpg')] bg-cover bg-center transition-transform group-hover:scale-105">
+                </div>
+                <div class="p-4 relative bg-white z-10">
+                  <span class="text-xs font-bold text-aduanas-blue mb-1 block">Fronteras</span>
+                  <h4 class="font-bold text-gray-800 leading-tight">Aduanas incauta contrabando en frontera
+                    chileno-argentina</h4>
+                </div>
+              </div>
+              <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden group cursor-pointer">
+                <div
+                  class="h-32 bg-gray-200 bg-[url('https://dpplosandes.dpp.gob.cl/media/2022/08/Paso-Fronterizo-Los-Libertadores-vuelve-a-permitir-el-transito-de-vehiculos-este-jueves-18-de-agosto-de-2022-1024x512-1-894x512.png')] bg-cover bg-center transition-transform group-hover:scale-105">
+                </div>
+                <div class="p-4 relative bg-white z-10">
+                  <span class="text-xs font-bold text-aduanas-blue mb-1 block">Institucional</span>
+                  <h4 class="font-bold text-gray-800 leading-tight">Nuevos horarios de atención en Paso Los Libertadores
+                    invierno 2026</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div id="sec-vehicles" class="hidden fade-in">
+          <div class="flex flex-col lg:flex-row gap-8">
+
+            <div class="w-full lg:w-2/3 bg-white p-8 rounded-xl shadow-md border border-gray-200">
+              <h2 class="text-2xl font-black text-gray-800 mb-2 border-b pb-4">Declaración de Vehículo (Acuerdo CH-AR)
+              </h2>
+              <p class="text-gray-500 text-sm mb-4 mt-2">Complete todos los datos. Los campos marcados con asterisco (*)
+                son obligatorios.</p>
+
+              <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-r-lg">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <i data-lucide="printer" class="h-5 w-5 text-green-500"></i>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm text-green-700 font-bold">Impresión Automática (Acuerdo CH-AR)</p>
+                    <p class="text-sm text-green-600">Al procesar la declaración, se generarán automáticamente las 2
+                      copias requeridas por el servicio.</p>
+                  </div>
+                </div>
+              </div>
+
+              <form id="form-vehicle" onsubmit="handleVehicleSubmit(event)" class="space-y-6">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                  <div>
+                    <div class="flex items-center justify-between mb-1">
+                      <label for="veh-patente" class="block text-sm font-bold text-gray-700">Patente *</label>
+                      <div class="relative tooltip cursor-help">
+                        <i data-lucide="help-circle" class="w-4 h-4 text-aduanas-blue"></i>
+                        <span class="tooltip-text">Sin guiones ni espacios. Ej: ABCD12</span>
+                      </div>
+                    </div>
+                    <input type="text" id="veh-patente"
+                      class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-aduanas-blue transition">
+                    <p class="text-red-600 text-xs mt-1 hidden font-medium" id="err-veh-patente">La patente es
+                      obligatoria.</p>
+                  </div>
+
+                  <div>
+                    <label for="veh-marca" class="block text-sm font-bold text-gray-700 mb-1">Marca *</label>
+                    <input type="text" id="veh-marca"
+                      class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-aduanas-blue transition">
+                    <p class="text-red-600 text-xs mt-1 hidden font-medium" id="err-veh-marca">La marca es obligatoria.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label for="veh-modelo" class="block text-sm font-bold text-gray-700 mb-1">Modelo *</label>
+                    <input type="text" id="veh-modelo"
+                      class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-aduanas-blue transition">
+                    <p class="text-red-600 text-xs mt-1 hidden font-medium" id="err-veh-modelo">El modelo es
+                      obligatorio.</p>
+                  </div>
+
+                  <div>
+                    <label for="veh-pais" class="block text-sm font-bold text-gray-700 mb-1">País de Procedencia
+                      *</label>
+                    <select id="veh-pais"
+                      class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-aduanas-blue transition">
+                      <option value="">-- Seleccione País --</option>
+                      <option value="CL">Chile</option>
+                      <option value="AR">Argentina</option>
+                    </select>
+                    <p class="text-red-600 text-xs mt-1 hidden font-medium" id="err-veh-pais">Seleccione un país válido.
+                    </p>
+                  </div>
+                </div>
+
+                <hr class="my-6">
+
+                <div class="bg-blue-50 p-6 rounded-lg border border-blue-100">
+                  <div class="flex items-center space-x-3 mb-2">
+                    <input type="checkbox" id="check-menores" onchange="toggleMenoresUpload()"
+                      class="w-5 h-5 text-aduanas-blue rounded focus:ring-aduanas-blue accent-aduanas-blue">
+                    <label for="check-menores" class="font-bold text-gray-800 text-lg cursor-pointer">Viaja con menores
+                      de edad</label>
+                  </div>
+                  <p class="text-sm text-gray-600 ml-8">Debe marcar esta casilla si viajan menores de 18 años.</p>
+
+                  <div id="menores-upload-zone"
+                    class="hidden mt-6 ml-8 transition-all duration-300 origin-top opacity-0 transform -translate-y-2">
+                    <div class="flex justify-between items-center mb-2">
+                      <h4 class="font-bold text-gray-800">Carga de Autorización Notarial</h4>
+                      <div class="relative tooltip cursor-help">
+                        <i data-lucide="help-circle" class="w-4 h-4 text-aduanas-blue"></i>
+                        <span class="tooltip-text">Doc en PDF/JPG. No requiere legalización consular en convenio
+                          AR.</span>
+                      </div>
+                    </div>
+
+                    <div
+                      class="border-2 border-dashed border-aduanas-blue bg-white p-6 rounded-lg text-center hover:bg-gray-50 transition">
+                      <i data-lucide="upload-cloud" class="w-10 h-10 text-aduanas-blue mx-auto mb-2"></i>
+                      <p class="text-sm text-gray-500 mb-4">Arrastre el documento o haga clic para subir</p>
+                      <input type="file" id="file-menor" accept=".pdf,.jpg,.jpeg,.png"
+                        onchange="handleFileUpload(event)">
+                      <label for="file-menor"
+                        class="bg-gray-200 text-gray-800 font-medium px-4 py-2 rounded shadow-sm cursor-pointer hover:bg-gray-300 transition">
+                        Seleccionar Archivo
+                      </label>
+                      <div id="file-name-display"
+                        class="mt-3 text-sm font-bold text-green-600 hidden flex items-center justify-center">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 mr-1"></i> <span id="file-name-text"></span>
+                      </div>
+                      <p class="text-red-600 text-xs mt-2 hidden font-medium" id="err-veh-file">Debe adjuntar la
+                        autorización notarial.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pt-4 flex justify-end">
+                  <button type="submit" id="btn-submit-veh"
+                    class="bg-aduanas-blue text-white font-bold px-8 py-3 rounded-lg hover-bg-aduanas-blue transition shadow-lg flex items-center">
+                    <span id="veh-btn-text">Registrar y Enviar Declaración</span>
+                    <i data-lucide="loader-2" id="veh-spinner" class="w-5 h-5 ml-2 animate-spin hidden"></i>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <div class="w-full lg:w-1/3 space-y-6">
+
+              <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+                <h3 class="font-bold text-gray-800 text-lg border-b pb-2 mb-4 flex items-center"><i
+                    data-lucide="headset" class="mr-2 text-aduanas-blue"></i> Asistencia en Línea</h3>
+                <p class="text-sm text-gray-600 mb-4">Si tiene dudas sobre el llenado de este formulario, nuestros
+                  agentes están disponibles para asistirle.</p>
+                <div class="space-y-3 text-sm">
+                  <div class="flex items-center text-gray-700">
+                    <i data-lucide="phone" class="w-4 h-4 mr-3 text-gray-400"></i>
+                    <span>600 400 0000 (OIRS)</span>
+                  </div>
+                  <div class="flex items-center text-gray-700">
+                    <i data-lucide="mail" class="w-4 h-4 mr-3 text-gray-400"></i>
+                    <a href="mailto:consultas@aduana.cl"
+                      class="text-aduanas-blue hover:underline">consultas@aduana.cl</a>
+                  </div>
+                  <div class="flex items-center text-gray-700">
+                    <i data-lucide="message-square" class="w-4 h-4 mr-3 text-gray-400"></i>
+                    <a href="#" class="text-aduanas-blue hover:underline">Chat en Vivo (Lun-Vie)</a>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-white rounded-xl shadow-md border border-gray-200 p-6 flex flex-col items-center justify-center relative overflow-hidden">
+
+                <div class="absolute top-0 left-0 w-full h-2 bg-aduanas-blue"></div>
+                <div class="absolute top-2 left-0 w-full h-2 bg-aduanas-red"></div>
+
+                <img src="./def-removebg-preview.webp" alt="Escudo Chile"
+                  class="w-24 opacity-80 mt-4 mb-2 filter grayscale-0">
+                <p class="text-xs text-gray-500 font-medium tracking-widest uppercase">Gobierno de Chile</p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div id="sec-admin" class="hidden fade-in space-y-6">
+          <div class="flex justify-between items-end mb-6 border-b pb-4">
+            <div>
+              <h2 class="text-3xl font-black text-gray-800 mb-1">Gestión de Usuarios</h2>
+              <p class="text-gray-600">Panel de administración seguro con enmascaramiento de datos personales.</p>
+            </div>
+            <button
+              class="bg-aduanas-blue text-white px-4 py-2 rounded shadow hover-bg-aduanas-blue font-bold flex items-center">
+              <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i> Nuevo Fiscalizador
+            </button>
+          </div>
+
+          <div class="bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200 text-sm">
+              <thead class="bg-gray-100">
+                <tr>
+                  <th scope="col" class="px-6 py-4 text-left font-bold text-gray-700 uppercase tracking-wider">ID /
+                    Username</th>
+                  <th scope="col" class="px-6 py-4 text-left font-bold text-gray-700 uppercase tracking-wider">Rol</th>
+                  <th scope="col" class="px-6 py-4 text-left font-bold text-gray-700 uppercase tracking-wider">Último
+                    Acceso</th>
+                  <th scope="col" class="px-6 py-4 text-right font-bold text-gray-700 uppercase tracking-wider">Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="font-bold text-gray-800">m.salinas***</div>
+                    <div class="text-xs text-gray-500">12.***.***-K</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap"><span
+                      class="bg-blue-100 text-aduanas-blue px-2 py-1 rounded-full text-xs font-bold">Fiscalizador</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-gray-500">Hace 2 horas</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium space-x-3">
+                    <button class="text-blue-600 hover:text-blue-900" title="Modificar Roles"><i data-lucide="edit"
+                        class="w-4 h-4"></i></button>
+                    <button class="text-red-600 hover:text-red-900" title="Eliminar Acceso" onclick="confirmDelete()"><i
+                        data-lucide="trash-2" class="w-4 h-4"></i></button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="font-bold text-gray-800">p.gonzalez***</div>
+                    <div class="text-xs text-gray-500">15.***.***-2</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap"><span
+                      class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-bold">Auditor</span></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-gray-500">Hace 1 día</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right font-medium space-x-3">
+                    <button class="text-blue-600 hover:text-blue-900"><i data-lucide="edit"
+                        class="w-4 h-4"></i></button>
+                    <button class="text-red-600 hover:text-red-900" onclick="confirmDelete()"><i data-lucide="trash-2"
+                        class="w-4 h-4"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
     </div>
 
-    <script>
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
-            const bgColor = type === 'success' ? 'bg-green-600' : 'bg-red-600';
-            
-            toast.className = `${bgColor} text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 transform translate-x-full transition-transform duration-300 z-50`;
-            
-            let iconSvg = '';
-            if (type === 'success') {
-                iconSvg = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-            } else {
-                iconSvg = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-            }
-            
-            toast.innerHTML = `${iconSvg} <span class="font-bold">${message}</span>`;
-            
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.remove('translate-x-full');
-            }, 10);
-            
-            setTimeout(() => {
-                toast.classList.add('translate-x-full');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+    <footer class="bg-gray-800 text-gray-300 py-8 mt-auto">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <img src="./def-removebg-preview.webp" alt="Logo" class="h-12 bg-white p-1 rounded mb-4">
+          <p class="text-sm text-gray-400">Servicio Nacional de Aduanas de Chile. Facilitando el comercio y protegiendo
+            nuestras fronteras.</p>
+        </div>
+        <div>
+          <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Enlaces Útiles</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white transition">Normativa Aduanera</a></li>
+            <li><a href="#" class="hover:text-white transition">Preguntas Frecuentes</a></li>
+            <li><a href="#" class="hover:text-white transition">Transparencia</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Términos y Privacidad</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white transition flex items-center"><i data-lucide="shield"
+                  class="w-4 h-4 mr-2"></i> Políticas de Privacidad y Ley N° 19.628</a></li>
+            <li><a href="#" class="hover:text-white transition">Términos de Uso del Portal</a></li>
+          </ul>
+        </div>
+      </div>
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-8 border-t border-gray-700 text-center text-sm text-gray-500">
+        &copy; 2026 Servicio Nacional de Aduanas. Todos los derechos reservados.
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+
+    let isAdmin = false;
+    let fileUploaded = false;
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+      lucide.createIcons();
+    });
+
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      const bgColor = type === 'success' ? 'bg-green-600' : 'bg-red-600';
+      const iconName = type === 'success' ? 'check-circle' : 'alert-circle';
+
+      toast.className = `${bgColor} text-white px-6 py-4 rounded-lg shadow-2xl flex items-center gap-3 transform translate-x-full transition-transform duration-300 z-50`;
+
+      let iconSvg = '';
+      if (type === 'success') {
+        iconSvg = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+      } else {
+        iconSvg = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+      }
+
+      toast.innerHTML = `
+        ${iconSvg}
+        <span class="font-bold">${message}</span>
+      `;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.remove('translate-x-full');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('translate-x-full');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+
+      const user = document.getElementById('login-user').value.trim();
+      const pass = document.getElementById('login-pass').value.trim();
+
+      let hasErrors = false;
+
+      if (!user) {
+        document.getElementById('login-user').classList.add('border-red-500');
+        document.getElementById('error-login-user').classList.remove('hidden');
+        hasErrors = true;
+      } else {
+        document.getElementById('login-user').classList.remove('border-red-500');
+        document.getElementById('error-login-user').classList.add('hidden');
+      }
+
+      if (!pass) {
+        document.getElementById('login-pass').classList.add('border-red-500');
+        document.getElementById('error-login-pass').classList.remove('hidden');
+        hasErrors = true;
+      } else {
+        document.getElementById('login-pass').classList.remove('border-red-500');
+        document.getElementById('error-login-pass').classList.add('hidden');
+      }
+
+      if (hasErrors) {
+        showToast('Complete los campos requeridos', 'error');
+        return;
+      }
+
+      const btnText = document.getElementById('login-btn-text');
+      const spinner = document.getElementById('login-spinner');
+
+      btnText.textContent = "Autenticando...";
+      spinner.classList.remove('hidden');
+
+      setTimeout(() => {
+        btnText.textContent = "Ingresar al Sistema";
+        spinner.classList.add('hidden');
+
+        isAdmin = (user.toLowerCase() === 'admin');
+        document.getElementById('header-user-name').textContent = isAdmin ? 'Administrador' : 'Fiscalizador';
+
+        if (isAdmin) {
+          document.getElementById('nav-admin').classList.remove('hidden');
+          document.getElementById('nav-admin').classList.add('flex');
+        } else {
+          document.getElementById('nav-admin').classList.add('hidden');
+          document.getElementById('nav-admin').classList.remove('flex');
         }
 
-        // Lógica de navegación simple
-        function handleLogin(e) {
-            e.preventDefault();
-            const u = document.getElementById('user').value.trim();
-            const p = document.getElementById('pass').value.trim();
+        document.getElementById('view-login').classList.add('hidden');
+        document.getElementById('app-layout').classList.remove('hidden');
+        document.getElementById('app-layout').classList.add('flex');
+        showSection('home');
 
-            let hasErrors = false;
+        showToast('Sesión iniciada correctamente', 'success');
 
-            if (!u) {
-                document.getElementById('user').classList.add('border-red-500');
-                document.getElementById('error-user').classList.remove('hidden');
-                hasErrors = true;
-            } else {
-                document.getElementById('user').classList.remove('border-red-500');
-                document.getElementById('error-user').classList.add('hidden');
-            }
+      }, 1000);
+    }
 
-            if (!p) {
-                document.getElementById('pass').classList.add('border-red-500');
-                document.getElementById('error-pass').classList.remove('hidden');
-                hasErrors = true;
-            } else {
-                document.getElementById('pass').classList.remove('border-red-500');
-                document.getElementById('error-pass').classList.add('hidden');
-            }
+    function logout() {
+      document.getElementById('app-layout').classList.add('hidden');
+      document.getElementById('app-layout').classList.remove('flex');
+      document.getElementById('view-login').classList.remove('hidden');
+      document.getElementById('login-user').value = '';
+      document.getElementById('login-pass').value = '';
+      document.getElementById('user-dropdown').classList.add('hidden');
+    }
 
-            if (hasErrors) {
-                return;
-            }
+    function toggleUserMenu() {
+      const menu = document.getElementById('user-dropdown');
+      menu.classList.toggle('hidden');
+    }
 
-            const btnText = document.getElementById('login-btn-text');
-            const spinner = document.getElementById('login-spinner');
-            
-            btnText.textContent = "Ingresando...";
-            spinner.classList.remove('hidden');
+    function showSection(sectionId) {
+      const sections = ['home', 'vehicles', 'admin'];
+      sections.forEach(sec => {
+        const el = document.getElementById('sec-' + sec);
+        const navItem = document.getElementById('nav-' + sec);
 
-            setTimeout(() => {
-                btnText.textContent = "Ingresar al Sistema";
-                spinner.classList.add('hidden');
-
-                if ((u === 'admin' && p === 'admin123') || (u === 'user' && p === '1234')) {
-                    let isAdmin = (u === 'admin');
-                    document.getElementById('header-user-name').textContent = isAdmin ? 'Administrador' : 'Fiscalizador';
-
-                    if (isAdmin) {
-                        document.getElementById('btn-admin').classList.remove('hidden');
-                    } else {
-                        document.getElementById('btn-admin').classList.add('hidden');
-                    }
-
-                    document.getElementById('view-login').classList.add('hidden');
-                    document.getElementById('app-layout').classList.remove('hidden');
-                    lucide.createIcons();
-                    showToast('Sesión iniciada correctamente', 'success');
-                } else {
-                    showToast('Datos incorrectos', 'error');
-                }
-            }, 1000);
+        if (sec === sectionId) {
+          el.classList.remove('hidden');
+          if (navItem) {
+            navItem.classList.add('border-l-4', 'border-aduanas-blue', 'bg-blue-50', 'text-aduanas-blue', 'font-bold');
+            navItem.classList.remove('border-transparent', 'text-gray-600');
+          }
+        } else {
+          el.classList.add('hidden');
+          if (navItem) {
+            navItem.classList.remove('border-l-4', 'border-aduanas-blue', 'bg-blue-50', 'text-aduanas-blue', 'font-bold');
+            navItem.classList.add('border-transparent', 'text-gray-600');
+          }
         }
+      });
+      lucide.createIcons();
+    }
 
-        let fileUploaded = false;
+    function toggleMenoresUpload() {
+      const isChecked = document.getElementById('check-menores').checked;
+      const uploadZone = document.getElementById('menores-upload-zone');
 
-        function toggleMenoresUpload() {
-            const isChecked = document.getElementById('check-menores').checked;
-            const uploadZone = document.getElementById('menores-upload-zone');
+      if (isChecked) {
+        uploadZone.classList.remove('hidden');
+        void uploadZone.offsetWidth;
+        uploadZone.classList.remove('opacity-0', '-translate-y-2');
+        uploadZone.classList.add('opacity-100', 'translate-y-0');
+      } else {
+        uploadZone.classList.remove('opacity-100', 'translate-y-0');
+        uploadZone.classList.add('opacity-0', '-translate-y-2');
+        setTimeout(() => {
+          if (!document.getElementById('check-menores').checked) {
+            uploadZone.classList.add('hidden');
+            document.getElementById('file-menor').value = '';
+            fileUploaded = false;
+            document.getElementById('file-name-display').classList.add('hidden');
+            document.getElementById('err-veh-file').classList.add('hidden');
+          }
+        }, 300);
+      }
+    }
 
-            if (isChecked) {
-                uploadZone.classList.remove('hidden');
-                void uploadZone.offsetWidth;
-                uploadZone.classList.remove('opacity-0', '-translate-y-2');
-                uploadZone.classList.add('opacity-100', 'translate-y-0');
-            } else {
-                uploadZone.classList.remove('opacity-100', 'translate-y-0');
-                uploadZone.classList.add('opacity-0', '-translate-y-2');
-                setTimeout(() => {
-                    if (!document.getElementById('check-menores').checked) {
-                        uploadZone.classList.add('hidden');
-                        document.getElementById('file-menor').value = '';
-                        fileUploaded = false;
-                        document.getElementById('file-name-display').classList.add('hidden');
-                        document.getElementById('err-veh-file').classList.add('hidden');
-                    }
-                }, 300);
-            }
+    function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('file-name-text').textContent = file.name;
+        document.getElementById('file-name-display').classList.remove('hidden');
+        document.getElementById('err-veh-file').classList.add('hidden');
+        fileUploaded = true;
+        showToast('Archivo preparado para subir: ' + file.name, 'success');
+      }
+    }
+
+    function handleVehicleSubmit(e) {
+      e.preventDefault();
+
+      const patente = document.getElementById('veh-patente');
+      const marca = document.getElementById('veh-marca');
+      const modelo = document.getElementById('veh-modelo');
+      const pais = document.getElementById('veh-pais');
+      const checkMenores = document.getElementById('check-menores');
+
+      let hasErrors = false;
+
+      const validateField = (el, errId) => {
+        if (!el.value.trim()) {
+          el.classList.add('border-red-500', 'ring-red-200');
+          document.getElementById(errId).classList.remove('hidden');
+          hasErrors = true;
+        } else {
+          el.classList.remove('border-red-500', 'ring-red-200');
+          document.getElementById(errId).classList.add('hidden');
         }
+      };
 
-        function handleFileUpload(e) {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('file-name-text').textContent = file.name;
-                document.getElementById('file-name-display').classList.remove('hidden');
-                document.getElementById('err-veh-file').classList.add('hidden');
-                fileUploaded = true;
-                showToast('Archivo preparado para subir: ' + file.name, 'success');
-            }
-        }
+      validateField(patente, 'err-veh-patente');
+      validateField(marca, 'err-veh-marca');
+      validateField(modelo, 'err-veh-modelo');
+      validateField(pais, 'err-veh-pais');
 
-        function handleVehicleSubmit(e) {
-            e.preventDefault();
-            const pat = document.getElementById('veh-patente').value.trim();
-            const mar = document.getElementById('veh-marca').value.trim();
-            const mod = document.getElementById('veh-modelo').value.trim();
-            const pai = document.getElementById('veh-pais').value;
-            const checkMenores = document.getElementById('check-menores');
+      if (checkMenores.checked && !fileUploaded) {
+        document.getElementById('err-veh-file').classList.remove('hidden');
+        hasErrors = true;
+      }
 
-            let hasErrors = false;
+      if (hasErrors) {
+        showToast('Por favor, corrija los errores en el formulario.', 'error');
+        return;
+      }
 
-            const checkField = (id, val) => {
-                if (!val) {
-                    document.getElementById(id).classList.add('border-red-500');
-                    document.getElementById('err-' + id).classList.remove('hidden');
-                    hasErrors = true;
-                } else {
-                    document.getElementById(id).classList.remove('border-red-500');
-                    document.getElementById('err-' + id).classList.add('hidden');
-                }
-            };
+      const btnText = document.getElementById('veh-btn-text');
+      const spinner = document.getElementById('veh-spinner');
 
-            checkField('veh-patente', pat);
-            checkField('veh-marca', mar);
-            checkField('veh-modelo', mod);
-            checkField('veh-pais', pai);
+      btnText.textContent = "Procesando...";
+      spinner.classList.remove('hidden');
+      document.getElementById('btn-submit-veh').disabled = true;
 
-            if (checkMenores.checked && !fileUploaded) {
-                document.getElementById('err-veh-file').classList.remove('hidden');
-                hasErrors = true;
-            }
+      setTimeout(() => {
+        btnText.textContent = "Registrar y Enviar Declaración";
+        spinner.classList.add('hidden');
+        document.getElementById('btn-submit-veh').disabled = false;
 
-            if (hasErrors) {
-                showToast('Por favor, corrija los errores en el formulario.', 'error');
-                return;
-            }
+        showToast('Declaración enviada exitosamente a SAG/PDI', 'success');
 
-            const btnText = document.getElementById('veh-btn-text');
-            const spinner = document.getElementById('veh-spinner');
+        e.target.reset();
+        fileUploaded = false;
+        document.getElementById('file-name-display').classList.add('hidden');
+        toggleMenoresUpload();
 
-            btnText.textContent = "Procesando...";
-            spinner.classList.remove('hidden');
-            document.getElementById('btn-submit-veh').disabled = true;
+      }, 1500);
+    }
 
-            setTimeout(() => {
-                btnText.textContent = "Registrar y Enviar Declaración";
-                spinner.classList.add('hidden');
-                document.getElementById('btn-submit-veh').disabled = false;
-                
-                showToast('Declaración registrada e Impresión iniciada', 'success');
-
-                e.target.reset();
-                fileUploaded = false;
-                document.getElementById('file-name-display').classList.add('hidden');
-                toggleMenoresUpload();
-                showSection('home');
-            }, 1500);
-        }
-
-        function toggleUserMenu() {
-            const menu = document.getElementById('user-dropdown');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-            } else {
-                menu.classList.add('hidden');
-            }
-        }
-
-        function logout() {
-            location.reload();
-        }
-
-        function confirmDelete() {
-            if(confirm("¿Está seguro que desea eliminar este acceso? Esta acción requiere autorización del jefe de turno.")) {
-                showToast("Solicitud de eliminación enviada a auditoría.", "success");
-            }
-        }
-
-        function showSection(id) {
-            const sections = ['home', 'vehicles', 'admin'];
-            sections.forEach(s => {
-                const el = document.getElementById('sec-' + s);
-                const btn = document.getElementById('btn-' + s);
-                if (s === id) {
-                    el.classList.remove('hidden');
-                    btn.classList.add('bg-gray-700', 'text-white');
-                    btn.classList.remove('text-gray-300');
-                } else {
-                    el.classList.add('hidden');
-                    btn.classList.remove('bg-gray-700', 'text-white');
-                    btn.classList.add('text-gray-300');
-                }
-            });
-            lucide.createIcons();
-        }
-
-        // Init icons
-        lucide.createIcons();
-    </script>
+    function confirmDelete() {
+      if (confirm('¿Está seguro que desea revocar el acceso a este usuario? Los registros de auditoría no se borrarán según ley N° 19.628.')) {
+        showToast('Acceso revocado correctamente (Auditoría preservada).', 'success');
+      }
+    }
+  </script>
 </body>
 
 </html>
